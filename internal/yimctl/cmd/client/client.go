@@ -1,8 +1,7 @@
 package client
 
 import (
-	"fmt"
-
+	"github.com/Ysoding/yim/internal/cli/client/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -18,5 +17,5 @@ func NewClientCmd() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	fmt.Print("command line client")
+	ui.Run()
 }
