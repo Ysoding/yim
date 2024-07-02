@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -15,20 +14,24 @@ import (
 
 type (
 	errMsg  error
-	recvMsg string
+	imMsg   *sdk.Message
+	sendMsg struct{}
 )
 
 type model struct {
 	viewport    viewport.Model
-	messages    []string
+	history     []string
 	textarea    textarea.Model
 	senderStyle lipgloss.Style
 	err         error
 	renderer    *glamour.TermRenderer
-	input       string
-	recv        string
 	chat        *sdk.Chat
 }
+
+var (
+	senderStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("5"))
+	recvStyle   = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("6"))
+)
 
 func initialModel(chat *sdk.Chat) model {
 	ta := textarea.New()
@@ -45,17 +48,17 @@ func initialModel(chat *sdk.Chat) model {
 	ta.FocusedStyle.CursorLine = lipgloss.NewStyle()
 	ta.ShowLineNumbers = false
 
-	vp := viewport.New(50, 5)
+	vp := viewport.New(500, 20)
 	ta.KeyMap.InsertNewline.SetEnabled(false)
 
 	renderer, _ := glamour.NewTermRenderer(
-		glamour.WithEnvironmentConfig(),
+		glamour.WithAutoStyle(),
 		glamour.WithWordWrap(0),
 	)
 
 	return model{
 		textarea:    ta,
-		messages:    []string{},
+		history:     []string{},
 		viewport:    vp,
 		senderStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("5")),
 		err:         nil,
@@ -84,28 +87,41 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyCtrlC, tea.KeyEsc:
-			fmt.Println(m.textarea.Value())
 			return m, tea.Quit
 		case tea.KeyEnter:
 			input := strings.TrimSpace(m.textarea.Value())
 			if input == "" {
 				break
 			}
-			m.input = input
-			m.viewport.SetContent(m.RenderConversation())
+			cmds = append(cmds, func() tea.Msg {
+				m.chat.Send(&sdk.Message{
+					Content: input,
+					Name:    "xxx",
+				})
+				return sendMsg{}
+			})
+
+			prompt := senderStyle.Render("You: ")
+			c, _ := m.renderer.Render(input)
+			c = ensureTrailingNewLine(c)
+			m.history = append(m.history, prompt+c)
+
+			m.viewport.SetContent(strings.Join(m.history, ""))
 			m.textarea.Reset()
 			m.viewport.GotoBottom()
 		}
-
-	case recvMsg:
-		m.recv = string(msg)
-		m.viewport.SetContent(m.RenderConversation())
+	case sendMsg:
+	case imMsg:
+		prompt := recvStyle.Render(msg.Name + ": ")
+		content, _ := m.renderer.Render(msg.Content)
+		content = ensureTrailingNewLine(content)
+		m.history = append(m.history, prompt+content)
+		m.viewport.SetContent(strings.Join(m.history, ""))
 		m.viewport.GotoBottom()
 	case errMsg:
 		m.err = msg
 		return m, nil
 	}
-
 	return m, tea.Batch(cmds...)
 }
 
@@ -116,50 +132,21 @@ func (m model) View() string {
 	)
 }
 
-var (
-	senderStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("5"))
-)
-
-func (m model) RenderConversation() string {
-	var sb strings.Builder
-
-	renderYou := func(content string) {
-		sb.WriteString(senderStyle.Render("You: "))
-		content, _ = m.renderer.Render(content)
-		sb.WriteString(ensureTrailingNewLine(content))
-	}
-
-	renderRecv := func(content string) {
-		sb.WriteString(senderStyle.Render("Recv: "))
-		content, _ = m.renderer.Render(content)
-		sb.WriteString(ensureTrailingNewLine(content))
-	}
-
-	if m.input != "" {
-		renderYou(m.input)
-	}
-
-	if m.recv != "" {
-		renderRecv(m.recv)
-	}
-
-	return sb.String()
-}
-
 func Run() {
-
 
 	chat := sdk.NewChat("192.168.0.1:9999", "test1", "test1", "")
 	p := tea.NewProgram(initialModel(chat))
 
-	go doRecv()
+	go func() {
+		rcvCh := chat.Recv()
+		for msg := range rcvCh {
+			p.Send(imMsg(msg))
+		}
+	}()
 
 	if _, err := p.Run(); err != nil {
 		log.Fatal(err)
 	}
-}
-func doRecv(chat*sdk.Chat) {
-	for c := range 
 }
 
 func ensureTrailingNewLine(s string) string {

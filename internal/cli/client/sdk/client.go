@@ -42,7 +42,7 @@ func (c *Chat) Send(msg *Message) {
 	c.conn.send(msg)
 }
 
-func (c *Chat) Recv() *Message {
+func (c *Chat) Recv() chan *Message {
 	return c.conn.recv()
 }
 
@@ -59,11 +59,12 @@ func newConnect(serverAddr string) *connect {
 }
 
 func (c *connect) send(msg *Message) {
-	c.sendChan <- msg
+	c.recvChan <- msg
+	// c.sendChan <- msg
 }
 
-func (c *connect) recv() *Message {
-	return <-c.recvChan
+func (c *connect) recv() chan *Message {
+	return c.recvChan
 }
 
 func (c *connect) close() {
