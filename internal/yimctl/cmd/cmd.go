@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/Ysoding/yim/internal/yimctl/cmd/client"
+	"github.com/Ysoding/yim/internal/yimctl/cmd/ipconfig"
 	"github.com/spf13/cobra"
 )
 
@@ -20,6 +21,7 @@ func NewYIMCtlCommand(in io.Reader, out, err io.Writer) *cobra.Command {
 
 	cmds.AddCommand(
 		client.NewClientCmd(),
+		ipconfig.NewClientCmd(),
 	)
 	return cmds
 }
