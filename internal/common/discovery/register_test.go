@@ -11,7 +11,7 @@ func TestRegister(t *testing.T) {
 	ctx := context.Background()
 	endpoints := []string{"localhost:2379"}
 
-	r, err := NewRegister(ctx, endpoints, "/web/node1", &EndpointInfo{IP: "127.0.0.1", Port: "6969"}, 5)
+	r, err := NewRegister(ctx, endpoints, "/web/node1", &EndpointInfo{IP: "127.0.0.1", Port: "6969"}, 5000)
 	if err != nil {
 		log.Fatalln(err)
 	}

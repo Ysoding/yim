@@ -2,6 +2,7 @@ package discovery
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -35,9 +36,11 @@ func (d *Discovery) Watch(prefix string, set, del func(key, value string)) error
 		return err
 	}
 
+	fmt.Println("test")
 	for _, ev := range resp.Kvs {
 		set(string(ev.Key), string(ev.Value))
 	}
+
 	d.watcher(prefix, set, del)
 	return nil
 }
