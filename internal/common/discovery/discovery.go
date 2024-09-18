@@ -2,13 +2,12 @@ package discovery
 
 import (
 	"context"
-	"log"
 	"sync"
 	"time"
 
-	"github.com/bytedance/gopkg/util/logger"
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.uber.org/zap"
 )
 
 type Discovery struct {
@@ -17,17 +16,17 @@ type Discovery struct {
 	ctx context.Context
 }
 
-func NewDiscovery(ctx context.Context, endpoints []string) *Discovery {
+func NewDiscovery(ctx context.Context, endpoints []string) (*Discovery, error) {
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   endpoints,
 		DialTimeout: 5 * time.Second,
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return &Discovery{cli: cli, ctx: ctx}
+	return &Discovery{cli: cli, ctx: ctx}, nil
 }
 
 func (d *Discovery) Watch(prefix string, set, del func(key, value string)) error {
@@ -45,7 +44,7 @@ func (d *Discovery) Watch(prefix string, set, del func(key, value string)) error
 
 func (d *Discovery) watcher(prefix string, set, del func(key, value string)) {
 	wcCh := d.cli.Watch(d.ctx, prefix, clientv3.WithPrefix())
-	logger.CtxInfof(d.ctx, "watching prefix:%s now...", prefix)
+	zap.L().Sugar().Infof("watching prefix:%s", prefix)
 
 	for resp := range wcCh {
 		for _, ev := range resp.Events {

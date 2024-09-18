@@ -3,7 +3,6 @@ module github.com/Ysoding/yim
 go 1.22.4
 
 require (
-	github.com/bytedance/gopkg v0.1.2-0.20240828084325-780ca9ee70fb
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/glamour v0.7.0
 	github.com/charmbracelet/lipgloss v0.9.1
@@ -11,6 +10,7 @@ require (
 	github.com/spf13/cobra v1.8.1
 	go.etcd.io/etcd/api/v3 v3.5.15
 	go.etcd.io/etcd/client/v3 v3.5.15
+	go.uber.org/zap v1.17.0
 )
 
 require (
@@ -19,6 +19,7 @@ require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/bytedance/go-tagexpr/v2 v2.9.2 // indirect
+	github.com/bytedance/gopkg v0.1.2-0.20240828084325-780ca9ee70fb // indirect
 	github.com/bytedance/sonic v1.12.0 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/charmbracelet/x/ansi v0.1.2 // indirect
@@ -61,7 +62,6 @@ require (
 	go.etcd.io/etcd/client/pkg/v3 v3.5.15 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	go.uber.org/zap v1.17.0 // indirect
 	golang.org/x/arch v0.0.0-20210923205945-b76863e36670 // indirect
 	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2 // indirect
 	golang.org/x/net v0.24.0 // indirect

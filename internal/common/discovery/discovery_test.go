@@ -3,15 +3,20 @@ package discovery
 import (
 	"context"
 	"fmt"
+	"log"
 	"testing"
 	"time"
 )
 
-func TestServiceDiscovery(t *testing.T) {
+func TestDiscovery(t *testing.T) {
 	ctx := context.Background()
 	endpoints := []string{"localhost:2379"}
 
-	ser := NewDiscovery(ctx, endpoints)
+	ser, err := NewDiscovery(ctx, endpoints)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	defer ser.Close()
 
 	set := func(key, value string) {
@@ -21,15 +26,19 @@ func TestServiceDiscovery(t *testing.T) {
 		fmt.Println(fmt.Sprintf("del %s=%s", key, value))
 	}
 
-	err := ser.Watch("/web/", set, del)
+	err = ser.Watch("/web/", set, del)
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	err = ser.Watch("/gRPC/", set, del)
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
-	time.Tick(10 * time.Second)
+	for {
+		select {
+		case <-time.Tick(10 * time.Second):
+		}
+	}
 }
