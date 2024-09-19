@@ -56,7 +56,7 @@ func (dp *Dispatcher) getCandidateEndpoints() []*Endpoint {
 	dp.mu.RLock()
 	defer dp.mu.RUnlock()
 
-	res := make([]*Endpoint, len(dp.candidateMap))
+	res := make([]*Endpoint, 0, len(dp.candidateMap))
 	for _, ep := range dp.candidateMap {
 		res = append(res, ep)
 	}

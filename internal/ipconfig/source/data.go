@@ -22,7 +22,7 @@ func dataHandler(ctx context.Context) {
 	defer dis.Close()
 
 	setFn := func(key, value string) {
-		var ed *discovery.EndpointInfo
+		ed := &discovery.EndpointInfo{}
 
 		if err := ed.Unmarshal([]byte(value)); err == nil {
 			if event, err := NewEvent(ed); err == nil {
