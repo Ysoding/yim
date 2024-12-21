@@ -1,0 +1,13 @@
+[package]
+name = "im-config"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { workspace = true }
+anyhow = { workspace = true }
+once_cell = { workspace = true }
+serde_yaml = "0.9.34"
+
+[lints]
+workspace = true

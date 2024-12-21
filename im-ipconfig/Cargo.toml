@@ -1,0 +1,11 @@
+[package]
+name = "im-ipconfig"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { workspace = true }
+im-config = { path = "../im-config" }
+
+[lints]
+workspace = true

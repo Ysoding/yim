@@ -1,0 +1,10 @@
+[package]
+name = "im-common"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+etcd-client = { workspace = true }
+
+[lints]
+workspace = true
