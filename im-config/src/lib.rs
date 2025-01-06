@@ -21,9 +21,9 @@ pub struct IpConfig {
 }
 
 #[derive(Debug, Deserialize)]
-struct DiscoveryConfig {
-    endpoints: Vec<String>,
-    timeout: u32,
+pub struct DiscoveryConfig {
+    pub endpoints: Vec<String>,
+    pub timeout: u64,
 }
 
 impl AppConfig {

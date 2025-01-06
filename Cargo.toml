@@ -9,6 +9,8 @@ im-config = { path = "im-config" }
 clap = { workspace = true }
 anyhow = { workspace = true }
 tokio = { workspace = true }
+log = { workspace = true }
+logforth = { workspace = true }
 enum_dispatch = "0.3.13"
 
 
@@ -16,6 +18,8 @@ enum_dispatch = "0.3.13"
 members = ["im-ipconfig", "im-config", "im-common"]
 
 [workspace.dependencies]
+log = "0.4.22"
+logforth = "0.19.2"
 anyhow = "1.0.94"
 axum = "0.7.9"
 clap = { version = "4.5.23", features = ["derive"] }

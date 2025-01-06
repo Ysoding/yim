@@ -4,8 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+log = { workspace = true }
 tokio = { workspace = true }
 im-config = { path = "../im-config" }
+im-common = { path = "../im-common" }
 
 [lints]
 workspace = true

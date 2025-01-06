@@ -1,3 +1,3 @@
 
-ipconf:
-	cargo run -p im-ipconfig
+ipconfig:
+	cargo run -- ipconfig
