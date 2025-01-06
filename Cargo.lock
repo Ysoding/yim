@@ -587,6 +587,8 @@ dependencies = [
  "im-common",
  "im-config",
  "log",
+ "rand",
+ "serde_json",
  "tokio",
 ]
 

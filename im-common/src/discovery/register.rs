@@ -62,9 +62,7 @@ impl Register {
         let value = self.value.clone();
 
         tokio::spawn(async move {
-            println!("222");
             while let Some(resp) = keep_alive.lock().await.message().await.unwrap() {
-                println!("1111");
                 log::info!(
                     "lease success: leaseId={}, key={}, val={}, resp={:?}",
                     lease_id,
@@ -119,10 +117,10 @@ mod tests {
     use super::*;
 
     #[tokio::test]
+
     async fn basic_test() {
         let endpoints = ["localhost:2379"];
 
-        // Register example
         let endpoint_info = EndpointInfo {
             ip: "127.0.0.1".to_string(),
             port: "6969".to_string(),

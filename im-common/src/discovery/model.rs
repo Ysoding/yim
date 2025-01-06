@@ -1,13 +1,11 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
-use serde_json::Result;
+use serde_json::{Result, Value};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct EndpointInfo {
     pub ip: String,
     pub port: String,
-    pub metadata: HashMap<String, String>,
+    pub metadata: Option<Value>,
 }
 
 impl EndpointInfo {
