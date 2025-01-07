@@ -1,3 +1,4 @@
+mod domain;
 mod source;
 
 use im_config::AppConfig;
