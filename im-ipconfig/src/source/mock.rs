@@ -8,20 +8,20 @@ pub(crate) fn start_mock() {
     let nodes = ["node1", "node2", "node3"];
 
     for (port, node) in ports.iter().zip(nodes.iter()) {
-        let port = port.to_string();
-        let node = node.to_string();
+        let port = (*port).to_string();
+        let node = (*node).to_string();
         tokio::spawn(test_register(port, node));
     }
 }
 
 async fn test_register(port: String, node: String) {
-    let path = format!("/yim/ip_dispatcher/{}", node);
+    let path = format!("/yim/ip_dispatcher/{node}");
     let mut ed = EndpointInfo {
         ip: "127.0.0.1".to_string(),
         port: port.clone(),
         metadata: Some(serde_json::json!({
-            "connect_num": rand::random::<f64>() * 696969.0,
-            "message_bytes": rand::random::<f64>() * 69696969.0,
+            "connect_num": rand::random::<f64>() * 696_969.0,
+            "message_bytes": rand::random::<f64>() * 69_696_969.0,
         })),
     };
 
@@ -37,8 +37,8 @@ async fn test_register(port: String, node: String) {
 
     loop {
         ed.metadata = Some(serde_json::json!({
-            "connect_num": rand::random::<f64>() * 696969.0,
-            "message_bytes": rand::random::<f64>() * 69696969.0,
+            "connect_num": rand::random::<f64>() * 696_969.0,
+            "message_bytes": rand::random::<f64>() * 69_696_969.0,
         }));
         if let Err(e) = r.update_value(&ed).await {
             log::error!("Failed to update value: {:?}", e);

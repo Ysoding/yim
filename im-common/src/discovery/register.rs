@@ -112,8 +112,6 @@ impl Register {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-
     use super::*;
 
     #[tokio::test]
@@ -124,7 +122,7 @@ mod tests {
         let endpoint_info = EndpointInfo {
             ip: "127.0.0.1".to_string(),
             port: "6969".to_string(),
-            metadata: HashMap::new(),
+            metadata: None,
         };
 
         let mut reg = Register::new(&endpoints, 10, "/web/node1", &endpoint_info, 5000)
@@ -138,7 +136,7 @@ mod tests {
         let new_endpoint_info = EndpointInfo {
             ip: "127.0.0.1".to_string(),
             port: "6970".to_string(),
-            metadata: HashMap::new(),
+            metadata: None,
         };
         reg.update_value(&new_endpoint_info).await.unwrap();
         tokio::time::sleep(Duration::from_secs(5)).await;

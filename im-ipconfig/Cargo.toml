@@ -8,8 +8,12 @@ log = { workspace = true }
 tokio = { workspace = true }
 serde_json = { workspace = true }
 rand = { workspace = true }
+anyhow = { workspace = true }
 im-config = { path = "../im-config" }
 im-common = { path = "../im-common" }
+
+[dev-dependencies]
+approx = "0.5.1"
 
 [lints]
 workspace = true

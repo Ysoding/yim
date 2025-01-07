@@ -21,7 +21,7 @@ pub(crate) struct Event {
 }
 
 impl Event {
-    fn new(ed: &EndpointInfo) -> Result<Self, Box<dyn std::error::Error>> {
+    pub(crate) fn new(ed: &EndpointInfo) -> Result<Self, Box<dyn std::error::Error>> {
         if ed.metadata.is_none() {
             return Err("endpoint metadata should not be None".into());
         }
@@ -30,12 +30,12 @@ impl Event {
 
         let connect_num = metadata
             .get("connect_num")
-            .and_then(|v| v.as_f64())
+            .and_then(serde_json::Value::as_f64)
             .ok_or("endpoint metadata connect_num cannot be converted to f64")?;
 
         let message_bytes = metadata
             .get("message_bytes")
-            .and_then(|v| v.as_f64())
+            .and_then(serde_json::Value::as_f64)
             .ok_or("endpoint metadata message_bytes cannot be converted to f64")?;
 
         Ok(Event {
@@ -45,6 +45,10 @@ impl Event {
             connect_num,
             message_bytes,
         })
+    }
+
+    pub(crate) fn key(&self) -> String {
+        format!("{}:{}", self.ip, self.port)
     }
 }
 
