@@ -1,5 +1,3 @@
-use tokio::sync::mpsc;
-
 use super::stat::Stat;
 
 const WINDOW_SIZE: i32 = 5;

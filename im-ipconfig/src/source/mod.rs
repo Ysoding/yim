@@ -1,4 +1,5 @@
 use im_common::discovery::{Discovery, EndpointInfo};
+use im_config::DiscoveryConfig;
 use std::sync::Arc;
 use tokio::{
     sync::{
@@ -21,7 +22,7 @@ pub(crate) struct Event {
 }
 
 impl Event {
-    pub(crate) fn new(ed: &EndpointInfo) -> Result<Self, Box<dyn std::error::Error>> {
+    pub(crate) fn new(ed: EndpointInfo) -> Result<Self, Box<dyn std::error::Error>> {
         if ed.metadata.is_none() {
             return Err("endpoint metadata should not be None".into());
         }
@@ -58,14 +59,20 @@ pub(crate) enum EventType {
     DelNodeEvent,
 }
 
-pub(crate) fn init() {
+pub(crate) fn init(config: DiscoveryConfig) {
     let (tx, rx) = mpsc::channel(100);
     EVENT_CHAN.set(Mutex::new(rx)).unwrap();
-    task::spawn(data_handler(Arc::new(tx)));
+    task::spawn(handler(Arc::new(tx), config));
 }
 
-async fn data_handler(event_tx: Arc<Sender<Event>>) {
-    let dis = match Discovery::new(&["localhost:2379"], 10).await {
+async fn handler(event_tx: Arc<Sender<Event>>, config: DiscoveryConfig) {
+    let endpoints = config
+        .endpoints
+        .iter()
+        .map(|v| v.as_str())
+        .collect::<Vec<&str>>();
+
+    let dis = match Discovery::new(&endpoints, config.timeout).await {
         Ok(dis) => dis,
         Err(e) => {
             log::error!("Failed to create discovery: {:?}", e);
@@ -84,7 +91,7 @@ async fn data_handler(event_tx: Arc<Sender<Event>>) {
 
         let event_tx = Arc::clone(&set_event_tx);
         tokio::spawn(async move {
-            let mut e = Event::new(&ed).unwrap();
+            let mut e = Event::new(ed).unwrap();
             e.typ = EventType::AddNodeEvent;
             event_tx.send(e).await.unwrap();
         });
@@ -101,7 +108,7 @@ async fn data_handler(event_tx: Arc<Sender<Event>>) {
 
         let event_tx = Arc::clone(&del_event_tx);
         tokio::spawn(async move {
-            let mut e = Event::new(&ed).unwrap();
+            let mut e = Event::new(ed).unwrap();
             e.typ = EventType::DelNodeEvent;
             event_tx.send(e).await.unwrap();
         });

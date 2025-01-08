@@ -16,11 +16,10 @@ pub(crate) fn init() {
     tokio::spawn(async move {
         let mut rx = source::EVENT_CHAN.get().unwrap().lock().await;
         while let Some(event) = rx.recv().await {
-            log::info!("{:?}", event);
             let mut dp = DP.get().unwrap().lock().await;
             match event.typ {
                 source::EventType::AddNodeEvent => dp.add_node_event(event).await,
-                source::EventType::DelNodeEvent => dp.del_node_event(event),
+                source::EventType::DelNodeEvent => dp.del_node_event(event).await,
             }
         }
     });

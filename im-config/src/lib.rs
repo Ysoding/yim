@@ -20,7 +20,7 @@ pub struct IpConfig {
     pub service_path: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct DiscoveryConfig {
     pub endpoints: Vec<String>,
     pub timeout: u64,

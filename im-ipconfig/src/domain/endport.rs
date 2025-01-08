@@ -1,41 +1,37 @@
-use std::sync::{
-    atomic::{AtomicPtr, Ordering},
-    Arc,
-};
-
+use serde::Serialize;
+use std::sync::Arc;
 use tokio::sync::{mpsc, Mutex};
 
 use super::{stat::Stat, window::StateWindow};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Clone)]
 pub(crate) struct Endport {
     ip: String,
     port: String,
-    active_score: f64,
-    static_score: f64,
-    stat: Arc<AtomicPtr<Stat>>,
-    window: Arc<Mutex<StateWindow>>,
-    stat_ch: mpsc::Sender<Stat>,
+    pub(crate) active_score: f64,
+    pub(crate) static_score: f64,
+    #[serde(skip_serializing)]
+    stat: Arc<Mutex<Stat>>,
+    #[serde(skip_serializing)]
+    _window: Arc<Mutex<StateWindow>>,
+    #[serde(skip_serializing)]
+    stat_ch: Arc<mpsc::Sender<Stat>>,
 }
 
 impl Endport {
     pub(crate) fn new(ip: String, port: String) -> Self {
         let (sender, mut receiver) = mpsc::channel(100);
         let window = Arc::new(Mutex::new(StateWindow::new()));
-        let stat = Arc::new(AtomicPtr::new(Box::into_raw(Box::new(Stat::default()))));
+        let stat = Arc::new(Mutex::new(Stat::default()));
 
-        let window_clone = window.clone();
-        let stat_clone = stat.clone();
+        let window_clone = Arc::clone(&window);
+        let stat_clone = Arc::clone(&stat);
         tokio::spawn(async move {
             while let Some(stat) = receiver.recv().await {
                 let mut window = window_clone.lock().await;
                 window.add_stat(stat);
                 let new_stat = window.get_stat();
-                let new_stat_ptr = Box::into_raw(Box::new(new_stat));
-                let old_stat_ptr = stat_clone.swap(new_stat_ptr, Ordering::SeqCst);
-                unsafe {
-                    let _ = Box::from_raw(old_stat_ptr); // Drop the old stat
-                }
+                *stat_clone.lock().await = new_stat;
             }
         });
 
@@ -45,8 +41,8 @@ impl Endport {
             active_score: 0.0,
             static_score: 0.0,
             stat,
-            window,
-            stat_ch: sender,
+            _window: window,
+            stat_ch: Arc::new(sender),
         }
     }
 
@@ -56,13 +52,10 @@ impl Endport {
         }
     }
 
-    pub fn calculate_score(&mut self) {
-        let stat_ptr = self.stat.load(Ordering::SeqCst);
-        if !stat_ptr.is_null() {
-            let stat = unsafe { &*stat_ptr };
-            self.active_score = stat.active_score();
-            self.static_score = stat.static_score();
-        }
+    pub(crate) async fn update_score(&mut self) {
+        let stat = self.stat.lock().await;
+        self.active_score = stat.active_score();
+        self.static_score = stat.static_score();
     }
 }
 
@@ -83,7 +76,7 @@ mod tests {
 
         tokio::time::sleep(Duration::from_secs(1)).await;
 
-        ep.calculate_score();
+        ep.update_score().await;
         assert_relative_eq!(ep.active_score, 1.86);
         assert_relative_eq!(ep.static_score, 6.0);
     }

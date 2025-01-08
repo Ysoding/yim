@@ -1,10 +1,11 @@
 #[derive(Default, Clone, Debug)]
 pub(crate) struct Stat {
-    pub connect_num: f64,   // 总体持有的长连接数量 的剩余值
-    pub message_bytes: f64, // 每秒收发消息的总字节数 的剩余值
+    pub(crate) connect_num: f64,   // 总体持有的长连接数量 的剩余值
+    pub(crate) message_bytes: f64, // 每秒收发消息的总字节数 的剩余值
 }
 
 impl Stat {
+    #[allow(dead_code)]
     pub(crate) fn new(connect_num: f64, message_bytes: f64) -> Self {
         Stat {
             connect_num,

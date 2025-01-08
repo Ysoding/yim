@@ -10,11 +10,11 @@ pub(crate) fn start_mock() {
     for (port, node) in ports.iter().zip(nodes.iter()) {
         let port = (*port).to_string();
         let node = (*node).to_string();
-        tokio::spawn(test_register(port, node));
+        tokio::spawn(mock_register(port, node));
     }
 }
 
-async fn test_register(port: String, node: String) {
+async fn mock_register(port: String, node: String) {
     let path = format!("/yim/ip_dispatcher/{node}");
     let mut ed = EndpointInfo {
         ip: "127.0.0.1".to_string(),
