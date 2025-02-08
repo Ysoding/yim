@@ -1,0 +1,21 @@
+[package]
+name = "im-state"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+log = { workspace = true }
+tokio = { workspace = true }
+serde_json = { workspace = true }
+rand = { workspace = true }
+axum = { workspace = true }
+anyhow = { workspace = true }
+serde = { workspace = true }
+im-config = { path = "../im-config" }
+im-common = { path = "../im-common" }
+
+[dev-dependencies]
+approx = "0.5.1"
+
+[lints]
+workspace = true

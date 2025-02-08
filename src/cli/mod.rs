@@ -1,7 +1,9 @@
 mod ipconfig;
+mod state;
 use std::path::PathBuf;
 
 use clap::Parser;
+use state::StateConfigOpts;
 
 use crate::AppConfig;
 
@@ -29,4 +31,6 @@ pub struct Opts {
 pub enum SubCommand {
     #[command(name = "ipconfig")]
     IpConfig(IpConfigOpts),
+    #[command(name = "state")]
+    State(StateConfigOpts),
 }
